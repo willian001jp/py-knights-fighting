@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from typing import Dict
+from ..entities.knight import Knight
+
 
 @dataclass
 class PotionEffect:
@@ -7,13 +8,14 @@ class PotionEffect:
     hp: int = 0
     protection: int = 0
 
+
 @dataclass
 class Potion:
     name: str
     effect: PotionEffect
 
-    def apply(self, target):
-        """Apply potion effects to target knight"""
+    def apply(self, target: Knight) -> None:
+        """Apply potion effects to target knight."""
         target.power += self.effect.power
         target.hp += self.effect.hp
         target.protection += self.effect.protection
