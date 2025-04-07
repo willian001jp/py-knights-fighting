@@ -1,6 +1,7 @@
 from ..entities.equipment import ArmorPiece, Weapon
 from ..entities.potion import Potion, PotionEffect
 
+
 KNIGHTS_CONFIG = {
     "lancelot": {
         "name": "Lancelot",
@@ -31,7 +32,10 @@ KNIGHTS_CONFIG = {
             ArmorPiece("breastplate", 15),
             ArmorPiece("boots", 10),
         ],
-        "potion": Potion("Berserk", PotionEffect(power=15, hp=-5, protection=10)),
+        "potion": Potion(
+            "Berserk",
+            PotionEffect(power=15, hp=-5, protection=10)
+        ),
     },
     "red_knight": {
         "name": "Red Knight",
