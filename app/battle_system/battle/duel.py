@@ -14,10 +14,12 @@ class Duel:
         damage2 = self.knight2.attack(self.knight1)
 
         self.log.append(
-            f"{self.knight1.name} hits {self.knight2.name} for {damage1} damage"
+            f"{self.knight1.name} hits "
+            f"{self.knight2.name} for {damage1} damage"
         )
         self.log.append(
-            f"{self.knight2.name} hits {self.knight1.name} for {damage2} damage"
+            f"{self.knight2.name} hits "
+            f"{self.knight1.name} for {damage2} damage"
         )
 
         return self.knight1.hp, self.knight2.hp
