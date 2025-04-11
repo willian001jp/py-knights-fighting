@@ -1,44 +1,61 @@
-from dataclasses import dataclass, field
-from typing import List, Optional
-from .equipment import ArmorPiece, Weapon
+from dataclasses import dataclass
+from typing import List, Optional, Dict
+from .armour import Armour
+from .weapon import Weapon
 from .potion import Potion
 
 
 @dataclass
 class Knight:
     name: str
-    base_power: int
-    base_hp: int
+    power: int
+    hp: int
+    armour: List[Armour]
     weapon: Weapon
-    armor: List[ArmorPiece] = field(default_factory=list)
     potion: Optional[Potion] = None
+    protection: int = 0
 
     def __post_init__(self) -> None:
-        self.power = self.base_power + self.weapon.power
-        self.hp = self.base_hp
-        self.protection = sum(piece.protection for piece in self.armor)
-
+        self.apply_armour()
+        self.apply_weapon()
         if self.potion:
-            self.potion.apply(self)
+            self.apply_potion()
 
-    def take_damage(self, damage: int) -> None:
-        """Apply damage to knight, ensuring HP doesn't go below 0."""
-        self.hp = max(0, self.hp - damage)
+    def apply_armour(self) -> None:
+        """Calculate total protection from all armour pieces"""
+        self.protection = sum(a.protection for a in self.armour)
 
-    def attack(self, opponent: "Knight") -> int:
-        """Attack another knight."""
+    def apply_weapon(self) -> None:
+        """Add weapon power to knight's base power"""
+        self.power += self.weapon.power
+
+    def apply_potion(self) -> None:
+        """Apply potion effects to knight's stats"""
+        if not self.potion:
+            return
+
+        effects = self.potion.effect
+        self.power += effects.get("power", 0)
+        self.protection += effects.get("protection", 0)
+        self.hp += effects.get("hp", 0)
+
+    def attack(self, opponent: "Knight") -> None:
+        """Attack another knight, reducing their HP"""
         damage = max(0, self.power - opponent.protection)
-        opponent.take_damage(damage)
-        return damage
+        opponent.hp = max(0, opponent.hp - damage)
 
-    @property
-    def is_alive(self) -> bool:
-        """Check if knight is still alive."""
-        return self.hp > 0
+    @classmethod
+    def from_config(cls, config: Dict) -> None:
+        """Create Knight instance from configuration dictionary"""
+        armour = [Armour(**a) for a in config.get("armour", [])]
+        weapon = Weapon(**config["weapon"])
+        potion = Potion(**config["potion"]) if config.get("potion") else None
 
-    def __str__(self) -> str:
-        status = "Alive" if self.is_alive else "Defeated"
-        return (f"{self.name}: {status} | "
-                f"HP: {self.hp} | "
-                f"Power: {self.power} | "
-                f"Protection: {self.protection}")
+        return cls(
+            name=config["name"],
+            power=config["power"],
+            hp=config["hp"],
+            armour=armour,
+            weapon=weapon,
+            potion=potion
+        )

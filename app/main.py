@@ -1,29 +1,34 @@
-from battle_system.config.knights import KNIGHTS_CONFIG
-from battle_system.entities.knight import Knight
-from battle_system.battle.simulator import BattleSimulator
+from typing import Dict
+from app.battle_system.entities.knight import Knight
 
 
-def initialize_knights() -> dict[str, Knight]:
-    """Create knight instances from configuration"""
-    return {name: Knight(**data) for name, data in KNIGHTS_CONFIG.items()}
+def battle(knights_config: Dict) -> Dict[str, int]:
+    """
+    Simulate battles between knights and return their remaining HP.
 
+    Args:
+        knights_config: Dictionary containing knights configuration
 
-def run_battle() -> dict[str, int]:
-    """Run the battle simulation and return results"""
-    knights = initialize_knights()
-    simulator = BattleSimulator(knights)
-    simulator.run_tournament()
+    Returns:
+        Dictionary with knights' names as keys and their remaining HP as values
+    """
+    # Create knight instances
+    lancelot = Knight.from_config(knights_config["lancelot"])
+    mordred = Knight.from_config(knights_config["mordred"])
+    arthur = Knight.from_config(knights_config["arthur"])
+    red_knight = Knight.from_config(knights_config["red_knight"])
 
-    print("\n=== Battle Log ===")
-    print(simulator.get_full_log())
+    # Battle 1: Lancelot vs Mordred
+    lancelot.attack(mordred)
+    mordred.attack(lancelot)
 
-    print("\n=== Final Results ===")
-    for knight in knights.values():
-        print(knight)
+    # Battle 2: Arthur vs Red Knight
+    arthur.attack(red_knight)
+    red_knight.attack(arthur)
 
-    return simulator.get_results()
-
-
-if __name__ == "__main__":
-    results = run_battle()
-    print("\nResults:", results)
+    return {
+        lancelot.name: lancelot.hp,
+        mordred.name: mordred.hp,
+        arthur.name: arthur.hp,
+        red_knight.name: red_knight.hp,
+    }
